@@ -1,0 +1,12 @@
+:JavaCopyDescriptor	java-copy-descriptor.txt	/*:JavaCopyDescriptor*
+java-copy-descriptor	java-copy-descriptor.txt	/*java-copy-descriptor*
+java-copy-descriptor-api	java-copy-descriptor.txt	/*java-copy-descriptor-api*
+java-copy-descriptor-commands	java-copy-descriptor.txt	/*java-copy-descriptor-commands*
+java-copy-descriptor-configuration	java-copy-descriptor.txt	/*java-copy-descriptor-configuration*
+java-copy-descriptor-intro	java-copy-descriptor.txt	/*java-copy-descriptor-intro*
+java-copy-descriptor-limitations	java-copy-descriptor.txt	/*java-copy-descriptor-limitations*
+java-copy-descriptor-requirements	java-copy-descriptor.txt	/*java-copy-descriptor-requirements*
+java-copy-descriptor.copy()	java-copy-descriptor.txt	/*java-copy-descriptor.copy()*
+java-copy-descriptor.descriptor_at_cursor()	java-copy-descriptor.txt	/*java-copy-descriptor.descriptor_at_cursor()*
+java-copy-descriptor.setup()	java-copy-descriptor.txt	/*java-copy-descriptor.setup()*
+java-copy-descriptor.txt	java-copy-descriptor.txt	/*java-copy-descriptor.txt*

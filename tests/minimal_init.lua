@@ -1,0 +1,6 @@
+local script = debug.getinfo(1, 'S').source:sub(2)
+local repo = vim.fn.fnamemodify(script, ':h:h')
+vim.opt.rtp:append(repo)
+vim.opt.rtp:append(vim.fn.stdpath('data') .. '/lazy/nvim-jdtls')
+vim.opt.rtp:append(vim.fn.stdpath('data') .. '/lazy/plenary.nvim')
+vim.cmd('filetype on')

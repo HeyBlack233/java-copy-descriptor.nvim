@@ -1,0 +1,102 @@
+*java-copy-descriptor.txt*  Copy Java JVM descriptors
+
+==============================================================================
+CONTENTS                                            *java-copy-descriptor*
+
+1. Introduction
+2. Requirements
+3. Commands
+4. Configuration
+5. Lua API
+6. Limitations
+
+==============================================================================
+1. INTRODUCTION                                    *java-copy-descriptor-intro*
+
+java-copy-descriptor.nvim extends nvim-jdtls with a command that copies the
+JVM method descriptor of the Java method or constructor under the cursor.
+
+Place the cursor on a method name and run: >
+    :JavaCopyDescriptor
+<
+For example, this declaration: >
+    public String plain(String text, Map<String, List<Long>> map)
+<
+produces: >
+    (Ljava/lang/String;Ljava/util/Map;)Ljava/lang/String;
+<
+The descriptor is written to the `+` register. The success notification also
+shows the resolved declaring class and member name.
+
+The command works on declarations and calls, resolves overloads, and supports
+source methods, binary dependencies, private and static methods, interface
+methods, constructors, arrays, varargs, generics, and type variables.
+
+==============================================================================
+2. REQUIREMENTS                                *java-copy-descriptor-requirements*
+
+- Neovim 0.11 or newer.
+- nvim-jdtls and an attached Eclipse JDT LS client.
+- The tree-sitter-java parser. With nvim-treesitter: >
+    :TSInstall java
+<
+- A writable `+` clipboard register.
+
+JDT LS needs class file content support for binary dependencies. nvim-jdtls
+enables it by default.
+
+==============================================================================
+3. COMMANDS                                      *java-copy-descriptor-commands*
+
+                                                        *:JavaCopyDescriptor*
+:JavaCopyDescriptor
+    Resolve the method or constructor under the cursor, build its JVM method
+    descriptor, and copy it to the configured clipboard register.
+
+    The command has no arguments and does not modify the buffer.
+
+==============================================================================
+4. CONFIGURATION                              *java-copy-descriptor-configuration*
+
+setup() is optional. It accepts: >
+    require('java-copy-descriptor').setup({
+      client_name = 'jdtls',
+      clipboard_register = '+',
+      notify = true,
+    })
+<
+client_name~
+    LSP client name. Default: "jdtls".
+
+clipboard_register~
+    Register that receives the descriptor. Default: "+".
+
+notify~
+    Show success and error notifications. Default: true.
+
+==============================================================================
+5. LUA API                                          *java-copy-descriptor-api*
+
+setup({opts})                                       *java-copy-descriptor.setup()*
+    Configure the plugin and return the effective options.
+
+copy()                                              *java-copy-descriptor.copy()*
+    Same behavior as |:JavaCopyDescriptor|.
+
+descriptor_at_cursor({callback})       *java-copy-descriptor.descriptor_at_cursor()*
+    Asynchronously resolve the descriptor under the cursor without writing to
+    the clipboard. `callback` receives `(err, descriptor, metadata)`.
+
+    `metadata` contains `owner`, `name`, `kind`, and `uri` when available.
+
+==============================================================================
+6. LIMITATIONS                                *java-copy-descriptor-limitations*
+
+- Only Java buffers with an attached jdtls client are supported.
+- Method references such as `Foo::new` depend on JDT LS call hierarchy support.
+- Anonymous and local class constructors may not have a discoverable
+  declaration.
+- If JDT LS cannot resolve a type, the command reports an error and does not
+  write a partial descriptor.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
