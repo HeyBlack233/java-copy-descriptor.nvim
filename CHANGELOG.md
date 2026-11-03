@@ -23,4 +23,4 @@ Unreleased.
 
 ### Contributors
 
-- HeyBlack
+- *placeholder*
