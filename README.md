@@ -57,12 +57,19 @@ JDT LS must be started with class file content support. `nvim-jdtls` enables thi
 ```lua
 {
   'HeyBlack233/java-copy-descriptor.nvim',
+  ft = 'java',
   dependencies = { 'mfussenegger/nvim-jdtls' },
   config = function()
     require('java-copy-descriptor').setup()
   end,
 }
 ```
+
+Keep `ft = 'java'` in the spec. Without it, lazy.nvim loads this plugin and its
+`nvim-jdtls` dependency at startup. With LazyVim's `lang.java` extra that also
+runs the extra's `attach_jdtls()` immediately, so JDT LS starts for the first
+buffer regardless of its filetype. See `:h java-copy-descriptor-troubleshooting`
+and the troubleshooting section below.
 
 ### Native packages
 
@@ -135,6 +142,11 @@ end)
 
 ## Troubleshooting
 
+- **jdtls starts for every file**: make this plugin filetype-lazy with
+  `ft = 'java'` in its lazy.nvim spec. An eager spec loads the `nvim-jdtls`
+  dependency at startup; LazyVim's `lang.java` extra then calls its
+  `attach_jdtls()` for whatever buffer is current, starting JDT LS even for
+  non-Java files.
 - **No jdtls client**: wait for the project to import or check your `nvim-jdtls` configuration.
 - **Tree-sitter parser missing**: run `:TSInstall java` and restart Neovim.
 - **Could not resolve Java type**: ensure the project imports successfully and dependencies are on the JDT LS classpath.

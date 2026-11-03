@@ -9,6 +9,7 @@ CONTENTS                                            *java-copy-descriptor*
 4. Configuration
 5. Lua API
 6. Limitations
+7. Troubleshooting
 
 ==============================================================================
 1. INTRODUCTION                                    *java-copy-descriptor-intro*
@@ -98,5 +99,28 @@ descriptor_at_cursor({callback})       *java-copy-descriptor.descriptor_at_curso
   declaration.
 - If JDT LS cannot resolve a type, the command reports an error and does not
   write a partial descriptor.
+
+==============================================================================
+7. TROUBLESHOOTING                        *java-copy-descriptor-troubleshooting*
+
+jdtls starts for every file~
+If JDT LS starts when opening non-Java files, the plugin is being loaded too
+early by lazy.nvim. Add `ft = 'java'` to the plugin spec. An eager spec loads
+the `nvim-jdtls` dependency at startup, and LazyVim's `lang.java` extra then
+calls `attach_jdtls()` for whatever buffer is current. >
+    {
+      'HeyBlack233/java-copy-descriptor.nvim',
+      ft = 'java',
+      dependencies = { 'mfussenegger/nvim-jdtls' },
+      config = function()
+        require('java-copy-descriptor').setup()
+      end,
+    }
+<
+No jdtls client~
+Wait for the Java project to import or check the nvim-jdtls configuration.
+
+Missing tree-sitter parser~
+Run `:TSInstall java` and restart Neovim.
 
  vim:tw=78:ts=8:noet:ft=help:norl:
