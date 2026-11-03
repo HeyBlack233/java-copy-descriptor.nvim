@@ -1,0 +1,99 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-master
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish GitHub release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version and release notes
+        id: changelog
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import os
+          import re
+          import sys
+          from pathlib import Path
+
+          lines = Path("CHANGELOG.md").read_text(encoding="utf-8").splitlines()
+
+          start = None
+          version = None
+          for index, line in enumerate(lines):
+              match = re.fullmatch(
+                  r"## (?P<version>\d+\.\d+\.\d+) - (?P<date>\d{4}-\d{2}-\d{2})",
+                  line.strip(),
+              )
+              if match:
+                  start = index
+                  version = match.group("version")
+                  break
+
+          if start is None or version is None:
+              sys.exit("CHANGELOG.md has no released version entry")
+
+          if version == "0.0.0":
+              sys.exit("CHANGELOG.md still contains the development placeholder")
+
+          end = next(
+              (
+                  index
+                  for index in range(start + 1, len(lines))
+                  if lines[index].startswith("## ")
+              ),
+              len(lines),
+          )
+
+          body = "\n".join(lines[start + 1 : end]).strip()
+          body = re.sub(
+              r"^### Release Date\n\n.*?\n\n",
+              "",
+              body,
+              count=1,
+              flags=re.DOTALL,
+          )
+          if not body:
+              sys.exit(f"CHANGELOG.md entry for {version} is empty")
+
+          notes_path = Path(os.environ["RUNNER_TEMP"]) / "release-notes.md"
+          notes_path.write_text(body.rstrip() + "\n", encoding="utf-8")
+
+          print(f"version={version}")
+          PY
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          VERSION: ${{ steps.changelog.outputs.version }}
+        run: |
+          tag="v$VERSION"
+          title="$REPO_NAME v$VERSION"
+
+          if gh release view "$tag" --repo "$REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $tag already exists; nothing to publish."
+            exit 0
+          fi
+
+          gh release create "$tag" \
+            --repo "$REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$title" \
+            --notes-file "$RUNNER_TEMP/release-notes.md"
