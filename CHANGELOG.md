@@ -2,11 +2,11 @@
 
 All notable user-visible changes to this project are documented in this file.
 
-## 0.0.0 - Unreleased
+## 0.1.0 - 2026-11-03
 
 ### Release Date
 
-Unreleased.
+2026-11-03.
 
 ### Highlights
 
@@ -20,7 +20,3 @@ Unreleased.
 - Added Vim help, configuration, and a headless test suite.
 - Documented the `ft = 'java'` lazy-loading requirement so JDT LS does not
   start for non-Java buffers.
-
-### Contributors
-
-- *placeholder*
